@@ -12,6 +12,7 @@
   "author": "Marlo Häring & Phillipp Schmedt",
   "devDependencies": {
     "electron": "^9.0.4",
+    "electron-reloader": "^1.0.1",
     "tslint": "^6.1.2",
     "typescript": "^3.9.5"
   }
