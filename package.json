@@ -1,0 +1,18 @@
+{
+  "name": "break",
+  "version": "1.0.0",
+  "description": "A minimal app reminding you to take a break. Take your health seriously!",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "lint": "tslint -c tslint.json -p tsconfig.json",
+    "start": "npm run build && electron ./dist/main.js"
+  },
+  "repository": "https://github.com/electron/electron-quick-start-typescript",
+  "author": "Marlo Häring & Phillipp Schmedt",
+  "devDependencies": {
+    "electron": "^9.0.4",
+    "tslint": "^6.1.2",
+    "typescript": "^3.9.5"
+  }
+}
