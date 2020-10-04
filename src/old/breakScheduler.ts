@@ -1,7 +1,29 @@
-const BreakScheduler = {
-    breaks: new Array<any>(),
+interface Break {
+    breakInSeconds: number,
+    duration: number
+}
+
+interface BreakScheduler {
+    breaks : Array<Break>,
+    currentBreakIndex : number,
+    nextBreakInTimer : NodeJS.Timeout
+    currentTimer : Break,
+    startScheduler() : void,
+    runScheduler() : void,
+    stopScheduler() : void,
+    moveToNextBreak() : void,
+    breakDone() : void,
+    skipToNextBreak() : void,
+    startNextBreak() : void,
+    restartScheduler() : void,
+}
+
+let breakScheduler : BreakScheduler = {
+    breaks: new Array<Break>(),
     currentBreakIndex: 0,
-    isRunning: false,
+    nextBreakInTimer: null,
+    currentTimer: null,
+
 
     // public
     startScheduler() {
@@ -77,22 +99,22 @@ const BreakScheduler = {
     }
 }
 
-BreakScheduler.breaks.push({ breakInSeconds: 2, duration: 1 })
-BreakScheduler.breaks.push({ breakInSeconds: 2000, duration: 5 })
+breakScheduler.breaks.push({ breakInSeconds: 2, duration: 5 })
+breakScheduler.breaks.push({ breakInSeconds: 2000, duration: 5 })
 
-console.log(BreakScheduler.breaks)
-BreakScheduler.startScheduler()
+console.log(breakScheduler.breaks)
+breakScheduler.startScheduler()
 
 setTimeout(() => {
-    BreakScheduler.stopScheduler()
+    breakScheduler.stopScheduler()
 }, 5000);
 
 setTimeout(() => {
-    BreakScheduler.startScheduler()
+    breakScheduler.startScheduler()
 }, 7000);
 
 setTimeout(() => {
-    BreakScheduler.restartScheduler()
+    breakScheduler.restartScheduler()
 }, 10000);
 
 

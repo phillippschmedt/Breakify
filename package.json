@@ -9,7 +9,7 @@
     "start": "npm run build && electron ./dist/main.js"
   },
   "repository": "https://github.com/phillippschmedt/break",
-  "author": "Marlo Häring & Phillipp Schmedt",
+  "author": "Phillipp Schmedt",
   "devDependencies": {
     "electron": "^9.0.4",
     "electron-reloader": "^1.0.1",
