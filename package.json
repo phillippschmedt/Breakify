@@ -6,14 +6,39 @@
     "build": "tsc",
     "watch": "tsc -w",
     "lint": "tslint -c tslint.json -p tsconfig.json",
-    "start": "npm run build && electron ./dist/main.js"
+    "start": "npm run build && electron ./dist/main.js",
+    "pack": "electron-builder --dir",
+    "dist": "npm run build && electron-builder",
+    "postinstall": "electron-builder install-app-deps"
   },
   "repository": "https://github.com/phillippschmedt/break",
   "author": "Phillipp Schmedt",
   "devDependencies": {
     "electron": "^9.0.4",
+    "electron-builder": "^22.8.1",
     "electron-reloader": "^1.0.1",
     "tslint": "^6.1.2",
     "typescript": "^3.9.5"
+  },
+  "main":"./dist/main.js",
+  "build": {
+    "appId": "io.breakify",
+    "extends": null,
+    "files": [
+      "./dist/**/*",
+      "./dist/main.js"
+    ],
+    "extraFiles": [
+      {
+        "from": "assets",
+        "to": "assets",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "mac": {
+      "category": "your.app.category.type"
+    }
   }
 }

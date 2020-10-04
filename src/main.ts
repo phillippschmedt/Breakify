@@ -86,7 +86,7 @@ function createSettingsWindow() {
 }
 
 function createTray() {
-  tray = new Tray('break.ico')
+  tray = new Tray('assets/break.ico')
   const contextMenu = Menu.buildFromTemplate([
     {
       label: 'Einstellungen', type: 'normal',
