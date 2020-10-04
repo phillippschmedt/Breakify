@@ -35,8 +35,8 @@ interface BreakScheduler {
 const breakScheduler: BreakScheduler = {
     intervalCounter: 0,
     shortestInterval: 0,
-    startBreakFunction: () => { },
-    stopBreakFunction: () => { },
+    startBreakFunction: null,
+    stopBreakFunction: null,
     schedule: null,
     intervalTimer: null,
     breakTimer: null,
