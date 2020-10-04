@@ -1,16 +1,17 @@
 import { app, Tray, Menu, BrowserWindow } from "electron";
 import * as path from "path";
 import breakScheduler from "./BreakScheduler"
+import { Break, Schedule } from "./BreakScheduler"
 
 
 try {
   require('electron-reloader')(module)
 } catch (_) { }  // replace with modern JS
 
-let tray: Tray = null
-let backgroundWindow: BrowserWindow = null
-let settingsWindow: BrowserWindow = null
-let breakWindow: BrowserWindow = null
+let tray: Tray
+let backgroundWindow : BrowserWindow
+let settingsWindow: BrowserWindow
+let breakWindow: BrowserWindow
 
 // Setup a Background Window. Keeps the app running in tray
 function createBackgroundWindow() {
@@ -110,8 +111,15 @@ app.whenReady().then(() => {
   createTray();
 
   // Run the BreakScheduler
-  breakScheduler.startScheduler()
-  breakScheduler.startBreakFunction = (duration) => {
+
+  let schedule : Schedule = {
+    shortBreak: { interval: 5, duration: 300, active: true },
+    mediumBreak: { interval: 15, duration: 4, active: true },
+    longBreak: { interval: 45, duration: 5, active: true },
+  }
+
+  breakScheduler.startScheduler(schedule)
+  breakScheduler.startBreakFunction = (duration : number) => {
     console.log("Create callback")
     createBreaksWindow(duration)
   }

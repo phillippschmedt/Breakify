@@ -1,64 +1,91 @@
-interface IntervalBreak {
+export interface Break {
     interval: number,
     duration: number,
     active: boolean,
 }
 
+export interface Schedule {
+    shortBreak: Break,
+    mediumBreak: Break,
+    longBreak: Break,
+}
+
 interface BreakScheduler {
-    shortBreak: IntervalBreak,
-    mediumBreak: IntervalBreak,
-    longBreak: IntervalBreak,
+    schedule: Schedule,
     shortestInterval: number,
     intervalCounter: number,
-    intervalTimer: NodeJS.Timeout,
-    breakTimer: NodeJS.Timeout,
-    startBreakFunction(duration : number) : void,
-    stopBreakFunction() : void,
-    startScheduler(): void,
+    intervalTimer: NodeJS.Timeout | null,
+    breakTimer: NodeJS.Timeout | null,
+    startBreakFunction: Function,
+    stopBreakFunction: Function,
+    startScheduler(schedule: Schedule): void,
     runScheduler(): void,
     stopScheduler(): void,
     breakDone(): void,
     skipToNextBreak(): void,
     startNextBreak(): void,
     restartScheduler(): void,
-    calculateNextBreak(): void,
+    calculateNextBreak(): number,
+    getShortBreak(): Break,
+    getMediumBreak(): Break,
+    getLongBreak(): Break,
 }
 
-const breakScheduler: BreakScheduler = {
-    intervalCounter: 0,
+// default schedule
+let defaultSchedule: Schedule = {
     shortBreak: { interval: 5, duration: 300, active: true },
     mediumBreak: { interval: 15, duration: 4, active: true },
     longBreak: { interval: 45, duration: 5, active: true },
-    shortestInterval: 0,
+}
+
+// default Interval
+let defaultInterval = defaultSchedule.shortBreak.interval
+
+const breakScheduler: BreakScheduler = {
+    intervalCounter: defaultInterval,
+    shortestInterval: defaultInterval,
+    schedule: defaultSchedule,
+    startBreakFunction: () => { },
+    stopBreakFunction: () => { },
     intervalTimer: null,
     breakTimer: null,
-    startBreakFunction: null,
-    stopBreakFunction: null,
 
     // public
-    startScheduler() {
+    startScheduler(schedule: Schedule) {
         console.log("Starting the scheduler")
 
-        // Initialize the intervalCounter with the smallest active interval
-        if (this.shortBreak.active) {
-            this.intervalCounter = this.shortBreak.interval
-        } else if (this.mediumBreak.active) {
-            this.intervalCounter = this.mediumBreak.interval
-        } else if (this.longBreak.active) {
-            this.intervalCounter = this.longBreak.interval
+        this.schedule = schedule
+
+        let shortBreak = this.getShortBreak()
+        let mediumBreak = this.getMediumBreak()
+        let longBreak = this.getLongBreak()
+
+        // Find the shortest active interval
+        if (shortBreak.active) {
+            this.shortestInterval = shortBreak.interval
+        } else if (mediumBreak.active) {
+            this.shortestInterval = mediumBreak.interval
+        } else if (longBreak.active) {
+            this.shortestInterval = longBreak.interval
         }
+        
+        // Let interval counter start with shortest interval
+        this.intervalCounter = this.shortestInterval
 
         this.runScheduler()
     },
 
     // public
     stopScheduler() {
-        clearTimeout(this.intervalTimer)
+        if (this.intervalTimer) {
+            clearTimeout(this.intervalTimer)
+        }
+        console.warn("Warning: Tried to stop scheduler that was not running.")
     },
 
     // public
     skipToNextBreak() {
-        console.log("Let's skip to the next break.")
+        console.log("Skipping to next break.")
         this.stopScheduler()
         this.startNextBreak()
     },
@@ -67,24 +94,14 @@ const breakScheduler: BreakScheduler = {
     restartScheduler() {
         console.log("Restarting scheduler")
         this.stopScheduler()
-        this.startScheduler()
+        this.runScheduler()
     },
 
     // private
     runScheduler() {
         // Check if we have atleast one active break. 
-        if (!this.shortBreak.active && !this.mediumBreak.active && !this.longBreak.active) {
-            console.log("Can't run scheduler. No active breaks.")
-            return
-        }
-
-        // We run a break at least every smallest interval.
-        if (this.shortBreak.active) {
-            this.shortestInterval = this.shortBreak.interval
-        } else if (this.mediumBreak.active) {
-            this.shortestInterval = this.mediumBreak.interval
-        } else if (this.longBreak.active) {
-            this.shortestInterval = this.longBreak.interval
+        if (!this.getShortBreak().active && !this.getMediumBreak().active && !this.getLongBreak().active) {
+            throw "Error: Can't run scheduler with no active breaks"
         }
 
         console.log("Next break in: " + this.shortestInterval)
@@ -94,19 +111,55 @@ const breakScheduler: BreakScheduler = {
     },
 
     // private
+    getShortBreak() {
+        if (this.schedule) {
+            return this.schedule.shortBreak
+        }
+
+        throw "Error: Schedule not defined"
+    },
+
+    // private
+    getMediumBreak() {
+        if (this.schedule) {
+            return this.schedule.mediumBreak
+        }
+
+        throw "Error: Schedule not defined"
+    },
+
+    // private
+    getLongBreak() {
+        if (this.schedule) {
+            return this.schedule.longBreak
+        }
+
+        throw "Error: Schedule not defined"
+    },
+
+    // private
     breakDone() {
         console.log("Break done")
         this.intervalCounter += this.shortestInterval
-        this.stopBreakFunction()
+
+        // Make sure callback function is defined.
+        if (this.stopBreakFunction) {
+            this.stopBreakFunction()
+        }
+
         this.runScheduler()
     },
 
     // private
     startNextBreak() {
-        const duration = this.calculateNextBreak()
+        const duration: number = this.calculateNextBreak()
 
         console.log("Let's take a break of:" + duration)
-        this.startBreakFunction(duration)
+
+        // Make sure callback function is defined.
+        if (this.startBreakFunction) {
+            this.startBreakFunction(duration)
+        }
         this.breakTimer = setTimeout(() => {
             this.breakDone()
 
@@ -115,25 +168,28 @@ const breakScheduler: BreakScheduler = {
     },
 
     // private
-    calculateNextBreak() {
+    calculateNextBreak(): number {
+        let longBreak = this.getLongBreak()
         // Long Break
-        if (this.longBreak.active && this.intervalCounter % this.longBreak.interval == 0) {
-            return this.longBreak.duration
+        if (longBreak.active && this.intervalCounter % longBreak.interval == 0) {
+            return longBreak.duration
         }
+
+        let mediumBreak = this.getMediumBreak()
 
         // Medium Break
-        if (this.mediumBreak.active && this.intervalCounter % this.mediumBreak.interval == 0) {
-            return this.mediumBreak.duration
+        if (mediumBreak.active && this.intervalCounter % mediumBreak.interval == 0) {
+            return mediumBreak.duration
         }
+
+        let shortBreak = this.getShortBreak();
 
         // Short Break
-        if (this.shortBreak.active) {
-            return this.shortBreak.duration
+        if (shortBreak.active) {
+            return shortBreak.duration
         }
 
-        // Things went wrong if we reach this point.
-        console.log("Invalid interval")
-        return
+        throw "Error: Invalid interval"
     },
 }
 

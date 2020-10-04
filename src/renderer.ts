@@ -5,7 +5,9 @@
 // Use preload.js to selectively enable features
 // needed in the renderer process.
 
-window.ipcRenderer.on('duration', function (event,duration) {
-    document.getElementById("duration").innerHTML = duration
-    console.log("Duration: " + duration)
+window.ipcRenderer.on('duration', function (event, duration) {
+    let durationElement = document.getElementById("duration")
+    if (durationElement) {
+        durationElement.innerHTML = duration
+    }
 });
