@@ -3,7 +3,7 @@ interface Break {
     duration: number
 }
 
-interface BreakScheduler {
+interface oldBreakScheduler {
     breaks : Array<Break>,
     currentBreakIndex : number,
     nextBreakInTimer : NodeJS.Timeout
@@ -18,7 +18,7 @@ interface BreakScheduler {
     restartScheduler() : void,
 }
 
-let breakScheduler : BreakScheduler = {
+let breakScheduler : oldBreakScheduler = {
     breaks: new Array<Break>(),
     currentBreakIndex: 0,
     nextBreakInTimer: null,

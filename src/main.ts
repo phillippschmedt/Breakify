@@ -1,6 +1,6 @@
 import { app, Tray, Menu, BrowserWindow } from "electron";
 import * as path from "path";
-import intervalBreakscheduler from "./intervalBreakScheduler"
+import breakScheduler from "./BreakScheduler"
 
 
 try {
@@ -110,13 +110,13 @@ app.whenReady().then(() => {
   createTray();
 
   // Run the BreakScheduler
-  intervalBreakscheduler.startScheduler()
-  intervalBreakscheduler.startBreakFunction = (duration) => {
+  breakScheduler.startScheduler()
+  breakScheduler.startBreakFunction = (duration) => {
     console.log("Create callback")
     createBreaksWindow(duration)
   }
 
-  intervalBreakscheduler.stopBreakFunction = () => {
+  breakScheduler.stopBreakFunction = () => {
     console.log("Close callback")
     closeBreaksWindow()
   }

@@ -4,7 +4,7 @@ interface IntervalBreak {
     active: boolean,
 }
 
-interface intervalBreakscheduler {
+interface BreakScheduler {
     shortBreak: IntervalBreak,
     mediumBreak: IntervalBreak,
     longBreak: IntervalBreak,
@@ -24,7 +24,7 @@ interface intervalBreakscheduler {
     calculateNextBreak(): void,
 }
 
-let intervalBreakscheduler: intervalBreakscheduler = {
+const breakScheduler: BreakScheduler = {
     intervalCounter: 0,
     shortBreak: { interval: 5, duration: 300, active: true },
     mediumBreak: { interval: 15, duration: 4, active: true },
@@ -137,5 +137,5 @@ let intervalBreakscheduler: intervalBreakscheduler = {
     },
 }
 
-export default intervalBreakscheduler
+export default breakScheduler
 
