@@ -9,7 +9,7 @@ try {
 } catch (_) { }  // replace with modern JS
 
 let tray: Tray
-let backgroundWindow : BrowserWindow
+let backgroundWindow: BrowserWindow
 let settingsWindow: BrowserWindow
 let breakWindow: BrowserWindow
 
@@ -21,7 +21,7 @@ function createBackgroundWindow() {
 }
 
 // Setup BreakWindow
-function createBreaksWindow(duration : number) {
+function createBreaksWindow(duration: number) {
   if (breakWindow) {
     breakWindow.show()
     breakWindow.webContents.send('duration', duration);
@@ -51,7 +51,7 @@ function createBreaksWindow(duration : number) {
 
     // Show window when we are done with all rendering. Looks more fluid.
     breakWindow.show()
- })
+  })
 
 
 }
@@ -112,22 +112,21 @@ app.whenReady().then(() => {
 
   // Run the BreakScheduler
 
-  let schedule : Schedule = {
-    shortBreak: { interval: 5, duration: 300, active: true },
-    mediumBreak: { interval: 15, duration: 4, active: true },
-    longBreak: { interval: 45, duration: 5, active: true },
+  let schedule: Schedule = {
+    shortBreak: { interval: 5, duration: 2, active: true },
+    mediumBreak: { interval: 15, duration: 4, active: false },
+    longBreak: { interval: 45, duration: 5, active: false },
   }
 
-  breakScheduler.startScheduler(schedule)
-  breakScheduler.startBreakFunction = (duration : number) => {
-    console.log("Create callback")
-    createBreaksWindow(duration)
-  }
+  
 
-  breakScheduler.stopBreakFunction = () => {
-    console.log("Close callback")
-    closeBreaksWindow()
-  }
+  breakScheduler.startScheduler(
+    schedule,
+    (duration: number) => {
+      createBreaksWindow(duration)
+    }, () => {
+      closeBreaksWindow()
+    })
 
 
   app.on("activate", function () {

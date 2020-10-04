@@ -16,9 +16,9 @@ interface BreakScheduler {
     intervalCounter: number,
     intervalTimer: NodeJS.Timeout | null,
     breakTimer: NodeJS.Timeout | null,
-    startBreakFunction: Function | null,
-    stopBreakFunction: Function | null,
-    startScheduler(schedule: Schedule): void,
+    startBreakCallback: Function | null,
+    stopBreakCallback: Function | null,
+    startScheduler(schedule: Schedule, startBreakCallback : (duration : number) => void, stopBreakCallback : (duration : number) => void) : void,
     runScheduler(): void,
     stopScheduler(): void,
     breakDone(): void,
@@ -38,15 +38,17 @@ const breakScheduler: BreakScheduler = {
     intervalCounter: 0,
     intervalTimer: null,
     breakTimer: null,
-    startBreakFunction: null,
-    stopBreakFunction: null,
+    startBreakCallback: null,
+    stopBreakCallback: null,
 
 
     // public
-    startScheduler(schedule) {
-        console.log("Starting the scheduler")
+    startScheduler(schedule, startBreakCallback, stopBreakCallback) {
+        console.log("Starting scheduler")
 
         this.schedule = schedule
+        this.startBreakCallback = startBreakCallback
+        this.stopBreakCallback = stopBreakCallback
 
         let shortBreak = this.getShortBreak()
         let mediumBreak = this.getMediumBreak()
@@ -59,6 +61,12 @@ const breakScheduler: BreakScheduler = {
             this.shortestInterval = mediumBreak.interval
         } else if (longBreak?.active) {
             this.shortestInterval = longBreak.interval
+        } else 
+        {
+            // The scheduler has nothng todo without active breaks. Stopping him
+            console.log("No active breaks found")
+            this.stopScheduler()
+            return
         }
 
         // Let interval counter start with shortest interval
@@ -69,10 +77,10 @@ const breakScheduler: BreakScheduler = {
 
     // public
     stopScheduler() {
+        console.log("Stopping scheduler")
         if (this.intervalTimer) {
             clearTimeout(this.intervalTimer)
         }
-        console.warn("Warning: Tried to stop scheduler that was not running.")
     },
 
     // public
@@ -129,8 +137,8 @@ const breakScheduler: BreakScheduler = {
         this.intervalCounter += this.shortestInterval
 
         // Make sure callback function is defined.
-        if (this.stopBreakFunction) {
-            this.stopBreakFunction()
+        if (this.stopBreakCallback) {
+            this.stopBreakCallback()
         }
 
         this.runScheduler()
@@ -143,8 +151,8 @@ const breakScheduler: BreakScheduler = {
         console.log("Let's take a break of:" + duration)
 
         // Make sure callback function is defined.
-        if (this.startBreakFunction) {
-            this.startBreakFunction(duration)
+        if (this.startBreakCallback) {
+            this.startBreakCallback(duration)
         }
         this.breakTimer = setTimeout(() => {
             this.breakDone()
