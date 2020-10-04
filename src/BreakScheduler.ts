@@ -26,9 +26,9 @@ interface BreakScheduler {
     startNextBreak(): void,
     restartScheduler(): void,
     calculateNextBreak(): number,
-    getShortBreak(): Break | null,
-    getMediumBreak(): Break | null,
-    getLongBreak(): Break | null,
+    getShortBreak(): Break | undefined,
+    getMediumBreak(): Break | undefined,
+    getLongBreak(): Break | undefined,
 }
 
 
@@ -106,8 +106,6 @@ const breakScheduler: BreakScheduler = {
         if (this.schedule) {
             return this.schedule.shortBreak
         }
-
-        throw "Error: Schedule not defined"
     },
 
     // private
@@ -115,8 +113,6 @@ const breakScheduler: BreakScheduler = {
         if (this.schedule) {
             return this.schedule.mediumBreak
         }
-
-        throw "Error: Schedule not defined"
     },
 
     // private
@@ -124,8 +120,6 @@ const breakScheduler: BreakScheduler = {
         if (this.schedule) {
             return this.schedule.longBreak
         }
-
-        throw "Error: Schedule not defined"
     },
 
     // private
