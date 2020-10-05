@@ -127,6 +127,7 @@ app.whenReady().then(() => {
   )
 
   breakScheduler.startScheduler()
+  
 
 
   app.on("activate", function () {

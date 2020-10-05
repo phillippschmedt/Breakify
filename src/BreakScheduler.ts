@@ -11,24 +11,27 @@ export interface Schedule {
 }
 
 export interface BreakScheduler {
-    schedule: Schedule,
-    intervalCounter: number,
-    shortestInterval: number,
-    intervalTimer?: NodeJS.Timeout,
-    breakTimer?: NodeJS.Timeout,
-    startBreakCallback: Function,
-    stopBreakCallback: Function,
+    // private
+    _schedule: Schedule,
+    _intervalCounter: number,
+    _shortestInterval: number,
+    _intervalTimer?: NodeJS.Timeout,
+    _breakTimer?: NodeJS.Timeout,
+    _startBreakCallback: Function,
+    _stopBreakCallback: Function,
+    _runScheduler(): void,
+    _breakDone(): void,
+    _startNextBreak(): void,
+    _calculateNextBreak(): number,
+    _getShortBreak(): Break,
+    _getMediumBreak(): Break,
+    _getLongBreak(): Break,
+
+    // public
     startScheduler(): void,
-    runScheduler(): void,
     stopScheduler(): void,
-    breakDone(): void,
-    skipToNextBreak(): void,
-    startNextBreak(): void,
     restartScheduler(): void,
-    calculateNextBreak(): number,
-    getShortBreak(): Break,
-    getMediumBreak(): Break,
-    getLongBreak(): Break,
+    skipToNextBreak(): void,
 }
 /**
  * Factory Method to create a BreakScheduler
@@ -53,23 +56,23 @@ export function createBreakScheduler(schedule: Schedule, startBreakCallback: (du
     }
 
     return {
-        schedule: schedule,
-        intervalCounter: shortestInterval,
-        shortestInterval: shortestInterval,
-        startBreakCallback: startBreakCallback,
-        stopBreakCallback: stopBreakCallback,
+        _schedule: schedule,
+        _intervalCounter: shortestInterval,
+        _shortestInterval: shortestInterval,
+        _startBreakCallback: startBreakCallback,
+        _stopBreakCallback: stopBreakCallback,
 
         // public
         startScheduler() {
             console.log("Starting scheduler")
-            this.runScheduler()
+            this._runScheduler()
         },
 
         // public
         stopScheduler() {
             console.log("Stopping scheduler")
-            if (this.intervalTimer) {
-                clearTimeout(this.intervalTimer)
+            if (this._intervalTimer) {
+                clearTimeout(this._intervalTimer)
             }
         },
 
@@ -77,87 +80,87 @@ export function createBreakScheduler(schedule: Schedule, startBreakCallback: (du
         skipToNextBreak() {
             console.log("Skipping to next break.")
             this.stopScheduler()
-            this.startNextBreak()
+            this._startNextBreak()
         },
 
         // public
         restartScheduler() {
             console.log("Restarting scheduler")
             this.stopScheduler()
-            this.runScheduler()
+            this._runScheduler()
         },
 
         // private
-        runScheduler() {
-            console.log("Next break in: " + this.shortestInterval)
-            this.intervalTimer = setTimeout(() => {
-                this.startNextBreak()
-            }, this.shortestInterval * 1000);
+        _runScheduler() {
+            console.log("Next break in: " + this._shortestInterval)
+            this._intervalTimer = setTimeout(() => {
+                this._startNextBreak()
+            }, this._shortestInterval * 1000);
         },
 
         // private
-        getShortBreak() {
-            return this.schedule.shortBreak
+        _getShortBreak() {
+            return this._schedule.shortBreak
         },
 
         // private
-        getMediumBreak() {
-            return this.schedule.mediumBreak
+        _getMediumBreak() {
+            return this._schedule.mediumBreak
         },
 
         // private
-        getLongBreak() {
-            return this.schedule.longBreak
+        _getLongBreak() {
+            return this._schedule.longBreak
         },
 
         // private
-        breakDone() {
+        _breakDone() {
             console.log("Break done")
 
             // Notify callback that the break is over
-            this.stopBreakCallback()
+            this._stopBreakCallback()
 
             // Move to next interval
-            this.intervalCounter += this.shortestInterval
+            this._intervalCounter += this._shortestInterval
 
             // Start the next interval
-            this.runScheduler()
+            this._runScheduler()
         },
 
         // private
-        startNextBreak() {
+        _startNextBreak() {
             // Calculates the duration of the next break
-            const duration: number = this.calculateNextBreak()
+            const duration: number = this._calculateNextBreak()
 
             console.log("Let's take a break of:" + duration)
 
             // Notify callback about our break
-            this.startBreakCallback(duration)
+            this._startBreakCallback(duration)
 
             // Start break timer
-            this.breakTimer = setTimeout(() => {
-                this.breakDone()
+            this._breakTimer = setTimeout(() => {
+                this._breakDone()
 
             }, duration * 1000);
 
         },
 
         // private
-        calculateNextBreak(): number {
+        _calculateNextBreak(): number {
             // Long Break
-            let longBreak = this.getLongBreak()
-            if (longBreak?.active && this.intervalCounter % longBreak.interval == 0) {
+            let longBreak = this._getLongBreak()
+            if (longBreak?.active && this._intervalCounter % longBreak.interval == 0) {
                 return longBreak.duration
             }
 
             // Medium Break
-            let mediumBreak = this.getMediumBreak()
-            if (mediumBreak?.active && this.intervalCounter % mediumBreak.interval == 0) {
+            let mediumBreak = this._getMediumBreak()
+            if (mediumBreak?.active && this._intervalCounter % mediumBreak.interval == 0) {
                 return mediumBreak.duration
             }
 
             // Short Break
-            let shortBreak = this.getShortBreak()
+            let shortBreak = this._getShortBreak()
             return shortBreak.duration
 
 
