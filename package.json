@@ -6,39 +6,55 @@
     "build": "tsc",
     "watch": "tsc -w",
     "lint": "tslint -c tslint.json -p tsconfig.json",
-    "start": "npm run build && electron ./dist/main.js",
-    "pack": "electron-builder --dir",
-    "dist": "npm run build && electron-builder",
-    "postinstall": "electron-builder install-app-deps"
+    "start": "tsc && electron-forge start",
+    "package": "tsc && electron-forge package",
+    "make": "tsc && electron-forge make"
   },
   "repository": "https://github.com/phillippschmedt/break",
   "author": "Phillipp Schmedt",
   "devDependencies": {
+    "@electron-forge/cli": "^6.0.0-beta.53",
+    "@electron-forge/maker-deb": "^6.0.0-beta.53",
+    "@electron-forge/maker-rpm": "^6.0.0-beta.53",
+    "@electron-forge/maker-squirrel": "^6.0.0-beta.53",
+    "@electron-forge/maker-zip": "^6.0.0-beta.53",
     "electron": "^9.0.4",
-    "electron-builder": "^22.8.1",
     "electron-reloader": "^1.0.1",
     "tslint": "^6.1.2",
     "typescript": "^3.9.5"
   },
-  "main":"./dist/main.js",
-  "build": {
-    "appId": "io.breakify",
-    "extends": null,
-    "files": [
-      "./dist/**/*",
-      "./dist/main.js"
-    ],
-    "extraFiles": [
-      {
-        "from": "assets",
-        "to": "assets",
-        "filter": [
-          "**/*"
-        ]
-      }
-    ],
-    "mac": {
-      "category": "your.app.category.type"
+  "main": "./dist/main.js",
+  "dependencies": {
+    "electron-squirrel-startup": "^1.0.0"
+  },
+  "config": {
+    "forge": {
+      "packagerConfig": {
+        "extraResource": "./assets",
+        "icon": "./assets/break"
+      },
+      "makers": [
+        {
+          "name": "@electron-forge/maker-squirrel",
+          "config": {
+            "name": "break"
+          }
+        },
+        {
+          "name": "@electron-forge/maker-zip",
+          "platforms": [
+            "darwin"
+          ]
+        },
+        {
+          "name": "@electron-forge/maker-deb",
+          "config": {}
+        },
+        {
+          "name": "@electron-forge/maker-rpm",
+          "config": {}
+        }
+      ]
     }
   }
 }

@@ -84,7 +84,7 @@ function createSettingsWindow() {
 }
 
 function createTray() {
-  tray = new Tray('assets/break.ico')
+  tray = new Tray('resources/assets/break.ico')
   const contextMenu = Menu.buildFromTemplate([
     {
       label: 'Settings', type: 'normal',
@@ -111,7 +111,7 @@ app.whenReady().then(() => {
   // Run the BreakScheduler
 
   let schedule: Schedule = {
-    shortBreak: { interval: 5, duration: 2, active: false },
+    shortBreak: { interval: 5, duration: 2, active: true },
     mediumBreak: { interval: 15, duration: 4, active: false },
     longBreak: { interval: 45, duration: 5, active: false },
   }
