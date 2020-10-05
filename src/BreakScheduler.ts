@@ -30,7 +30,13 @@ export interface BreakScheduler {
     getMediumBreak(): Break,
     getLongBreak(): Break,
 }
-
+/**
+ * Factory Method to create a BreakScheduler
+ * @param  {Schedule} schedule A schedule containing at least one active break
+ * @param  {Function}  startBreakCallback
+ * @param  {Function}  stopBreakCallback
+ * @return {BreakScheduler}  Returns a breakscheduler
+ */
 export function createBreakScheduler(schedule: Schedule, startBreakCallback: (duration: number) => void, stopBreakCallback: (duration: number) => void): BreakScheduler {
 
     // Makes sure schedule has at least one active break
@@ -49,14 +55,13 @@ export function createBreakScheduler(schedule: Schedule, startBreakCallback: (du
     return {
         schedule: schedule,
         intervalCounter: shortestInterval,
+        shortestInterval: shortestInterval,
         startBreakCallback: startBreakCallback,
         stopBreakCallback: stopBreakCallback,
-        shortestInterval: shortestInterval,
 
         // public
         startScheduler() {
             console.log("Starting scheduler")
-
             this.runScheduler()
         },
 
@@ -108,26 +113,28 @@ export function createBreakScheduler(schedule: Schedule, startBreakCallback: (du
         // private
         breakDone() {
             console.log("Break done")
+
+            // Notify callback that the break is over
+            this.stopBreakCallback()
+
+            // Move to next interval
             this.intervalCounter += this.shortestInterval
 
-            // Make sure callback function is defined.
-            if (this.stopBreakCallback) {
-                this.stopBreakCallback()
-            }
-
+            // Start the next interval
             this.runScheduler()
         },
 
         // private
         startNextBreak() {
+            // Calculates the duration of the next break
             const duration: number = this.calculateNextBreak()
 
             console.log("Let's take a break of:" + duration)
 
-            // Make sure callback function is defined.
-            if (this.startBreakCallback) {
-                this.startBreakCallback(duration)
-            }
+            // Notify callback about our break
+            this.startBreakCallback(duration)
+
+            // Start break timer
             this.breakTimer = setTimeout(() => {
                 this.breakDone()
 
@@ -137,27 +144,23 @@ export function createBreakScheduler(schedule: Schedule, startBreakCallback: (du
 
         // private
         calculateNextBreak(): number {
-            let longBreak = this.getLongBreak()
             // Long Break
+            let longBreak = this.getLongBreak()
             if (longBreak?.active && this.intervalCounter % longBreak.interval == 0) {
                 return longBreak.duration
             }
 
-            let mediumBreak = this.getMediumBreak()
-
             // Medium Break
+            let mediumBreak = this.getMediumBreak()
             if (mediumBreak?.active && this.intervalCounter % mediumBreak.interval == 0) {
                 return mediumBreak.duration
             }
 
-            let shortBreak = this.getShortBreak();
-
             // Short Break
-            if (shortBreak?.active) {
-                return shortBreak.duration
-            }
+            let shortBreak = this.getShortBreak()
+            return shortBreak.duration
 
-            throw "Error: Invalid interval"
+
         },
     }
 }
