@@ -33,7 +33,6 @@ export interface BreakScheduler {
 
 export function createBreakScheduler(schedule: Schedule, startBreakCallback: (duration: number) => void, stopBreakCallback: (duration: number) => void): BreakScheduler {
 
-
     // Makes sure schedule has at least one active break
     // Then calculates the shortestInterval
     let shortestInterval
