@@ -38,13 +38,13 @@ export function createBreakScheduler(schedule: Schedule, startBreakCallback: (du
         throw "Error: createBreakScheduler() - Schedule has no active"
     }
 
-    let intervalCounter = shortestInterval
-    let _intervalTimer: NodeJS.Timeout
-    let _breakTimer: NodeJS.Timeout
+    let intervalCounter : number = shortestInterval
+    let intervalTimer: NodeJS.Timeout
+    let breakTimer: NodeJS.Timeout
 
     function runScheduler() {
         console.log("Next break in: " + shortestInterval)
-        _intervalTimer = setTimeout(() => {
+        intervalTimer = setTimeout(() => {
             startNextBreak()
         }, shortestInterval * 1000);
     }
@@ -84,7 +84,7 @@ export function createBreakScheduler(schedule: Schedule, startBreakCallback: (du
         startBreakCallback(duration)
 
         // Start break timer
-        _breakTimer = setTimeout(() => {
+        breakTimer = setTimeout(() => {
             breakDone()
 
         }, duration * 1000);
@@ -107,8 +107,6 @@ export function createBreakScheduler(schedule: Schedule, startBreakCallback: (du
         // Short Break
         let shortBreak = getShortBreak()
         return shortBreak.duration
-
-
     }
 
     // Return the BreakScheduler
@@ -120,8 +118,8 @@ export function createBreakScheduler(schedule: Schedule, startBreakCallback: (du
 
         stopScheduler() {
             console.log("Stopping scheduler")
-            if (_intervalTimer) {
-                clearTimeout(_intervalTimer)
+            if (intervalTimer) {
+                clearTimeout(intervalTimer)
             }
         },
 
