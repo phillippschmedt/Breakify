@@ -32,7 +32,10 @@ export interface BreakScheduler {
 }
 
 export function createBreakScheduler(schedule: Schedule, startBreakCallback: (duration: number) => void, stopBreakCallback: (duration: number) => void): BreakScheduler {
-    // Calculate the shortestInterval. The shortestInterval is also used as the initializer for the intervalCounter
+
+
+    // Makes sure schedule has at least one active break
+    // Then calculates the shortestInterval
     let shortestInterval
     if (schedule.shortBreak?.active) {
         shortestInterval = schedule.shortBreak.interval
