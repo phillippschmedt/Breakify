@@ -10,6 +10,6 @@
  Implement silent for X minutes / hours / until restart
  Build non-fullscreen beak screen
  Build beautiful break screen
- Add build step to bundle app
  Add installer for app
  Add auto-start with windows option
+    npm: auto-launch
