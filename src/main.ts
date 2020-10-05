@@ -1,6 +1,6 @@
 import { app, Tray, Menu, BrowserWindow } from "electron";
 import * as path from "path";
-import { Break, Schedule, createBreakScheduler } from "./BreakScheduler"
+import { Break, Schedule, createBreakScheduler, BreakScheduler } from "./BreakScheduler"
 
 try {
   require('electron-reloader')(module)
@@ -116,7 +116,7 @@ app.whenReady().then(() => {
     longBreak: { interval: 45, duration: 5, active: false },
   }
 
-  let breakScheduler = createBreakScheduler(
+  let breakScheduler : BreakScheduler = createBreakScheduler(
     schedule,
     function startBreakcallback(duration: number) {
       createBreaksWindow(duration)
