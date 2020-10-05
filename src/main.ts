@@ -3,7 +3,6 @@ import * as path from "path";
 import breakScheduler from "./BreakScheduler"
 import { Break, Schedule } from "./BreakScheduler"
 
-
 try {
   require('electron-reloader')(module)
 } catch (_) { }  // replace with modern JS
@@ -89,7 +88,7 @@ function createTray() {
   tray = new Tray('assets/break.ico')
   const contextMenu = Menu.buildFromTemplate([
     {
-      label: 'Einstellungen', type: 'normal',
+      label: 'Settings', type: 'normal',
       click: function () {
         createSettingsWindow();
       }
