@@ -28,6 +28,7 @@ export function createBreakScheduler(schedule: Schedule, startBreakCallback: (du
     // Makes sure schedule has at least one active break
     // Then calculates the shortestInterval
     let shortestInterval: number
+    
     if (schedule.shortBreak?.active) {
         shortestInterval = schedule.shortBreak.interval
     } else if (schedule.mediumBreak?.active) {
@@ -42,26 +43,26 @@ export function createBreakScheduler(schedule: Schedule, startBreakCallback: (du
     let intervalTimer: NodeJS.Timeout
     let breakTimer: NodeJS.Timeout
 
-    function runScheduler() {
+    function runScheduler() : void {
         console.log("Next break in: " + shortestInterval)
         intervalTimer = setTimeout(() => {
             startNextBreak()
         }, shortestInterval * 1000);
     }
 
-    function getShortBreak() {
+    function getShortBreak() : Break {
         return schedule.shortBreak
     }
 
-    function getMediumBreak() {
+    function getMediumBreak() : Break {
         return schedule.mediumBreak
     }
 
-    function getLongBreak() {
+    function getLongBreak() : Break {
         return schedule.longBreak
     }
 
-    function breakDone() {
+    function breakDone() : void {
         console.log("Break done")
 
         // Notify callback that the break is over
@@ -74,7 +75,7 @@ export function createBreakScheduler(schedule: Schedule, startBreakCallback: (du
         runScheduler()
     }
 
-    function startNextBreak() {
+    function startNextBreak() : void {
         // Calculates the duration of the next break
         const duration: number = calculateNextBreak()
 
@@ -91,7 +92,7 @@ export function createBreakScheduler(schedule: Schedule, startBreakCallback: (du
 
     }
 
-    function calculateNextBreak(): number {
+    function calculateNextBreak() : number {
         // Long Break
         let longBreak = getLongBreak()
         if (longBreak?.active && intervalCounter % longBreak.interval == 0) {
