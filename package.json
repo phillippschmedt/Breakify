@@ -30,7 +30,6 @@
   "config": {
     "forge": {
       "packagerConfig": {
-        "extraResource": "./assets",
         "icon": "./assets/break"
       },
       "makers": [

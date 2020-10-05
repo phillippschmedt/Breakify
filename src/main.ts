@@ -84,7 +84,7 @@ function createSettingsWindow() {
 }
 
 function createTray() {
-  tray = new Tray('resources/assets/break.ico')
+  tray = new Tray(path.join(__dirname,'../assets/break.ico'))
   const contextMenu = Menu.buildFromTemplate([
     {
       label: 'Settings', type: 'normal',
