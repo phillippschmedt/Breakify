@@ -111,8 +111,6 @@ app.whenReady().then(() => {
 
   // Run the BreakScheduler
 
-
-
   let schedule: Schedule = {
     shortBreak: { interval: 3, duration: 5, active: true },
     mediumBreak: { interval: 12, duration: 10, active: true },
@@ -130,6 +128,8 @@ app.whenReady().then(() => {
       createBreaksWindow(duration)
     },
     function stopBreakcallback() {
+
+      // Only close the break window when the autoFinishBreak config is enabled.
       if (breakTimerConfig.autoFinishBreak) {
         closeBreaksWindow()
       }
