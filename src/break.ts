@@ -6,13 +6,16 @@
 // needed in the renderer process.
 
 // Let the UI start the break progress
-window.ipcRenderer.on('duration', function (event, durationInSeconds : number) {
+window.ipcRenderer.on('ipc_startbreak', function (event, durationInSeconds: number) {
 
     // The progressbar
     let progressBarElement = <HTMLProgressElement>document.getElementById("progressBar")
 
     // The text showing the time remaining
     let timeRemainingElement = <HTMLSpanElement>document.getElementById('progressTimeRemaining')
+
+    // Finish or Skip Button
+    let finishBreakButton = <HTMLButtonElement>document.getElementById("finishBreakButton")
 
 
     // We update our progressbar every 100ms. This calculates how many steps we need to reach the duration.
@@ -31,7 +34,7 @@ window.ipcRenderer.on('duration', function (event, durationInSeconds : number) {
         progressBarElement.value = progress;
         progress = progress - stepSize;
 
-        let timePassedInMilliseconds = Date.now()-startedTime;
+        let timePassedInMilliseconds = Date.now() - startedTime;
 
         // Duration is in seconds and timePassedInMilliseconds is in milliseconds. That's why we do / 1000
         let timeRemainingInSeconds = durationInSeconds - (timePassedInMilliseconds / 1000);
@@ -40,15 +43,18 @@ window.ipcRenderer.on('duration', function (event, durationInSeconds : number) {
         timeRemainingElement.innerHTML = (Math.ceil(timeRemainingInSeconds)).toString() + " seconds remaining"
 
         if (progress == 0) {
-            clearInterval(progressIntervalTimer)
+            finishBreakButton.innerHTML = "Finish Break";
+            clearInterval(progressIntervalTimer);
         }
     }, 100)
 
+    finishBreakButton.addEventListener('click', () => {
+        // Stop progressbar updates
+        clearInterval(progressIntervalTimer)
+
+        // Notify main process about the button click
+        window.ipcRenderer.send('finishBreakButtonClicked')
+    })
+
+
 });
-
-let finishBreakButton = <HTMLButtonElement>document.getElementById("finishBreakButton")
-finishBreakButton.addEventListener('click', () => {
-    window.ipcRenderer.send('finishBreakButtonClicked')
-})
-
-

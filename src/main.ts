@@ -31,7 +31,7 @@ function createBackgroundWindow() {
 function createBreaksWindow(duration: number) {
   if (breakWindow) {
     breakWindow.show()
-    breakWindow.webContents.send('duration', duration);
+    breakWindow.webContents.send('ipc_startbreak', duration);
     return
   }
 
@@ -50,11 +50,11 @@ function createBreaksWindow(duration: number) {
   // and load the index.html of the app.
   breakWindow.loadFile(path.join(__dirname, "../src/pages/break.html"));
 
-  breakWindow.webContents.openDevTools();
+  //breakWindow.webContents.openDevTools();
 
   // Wait for page to finish load before we can send data
   breakWindow.webContents.on('did-finish-load', () => {
-    breakWindow.webContents.send('duration', duration)
+    breakWindow.webContents.send('ipc_startbreak', duration)
 
     // Show window when we are done with all rendering. Looks more fluid.
     breakWindow.show()
