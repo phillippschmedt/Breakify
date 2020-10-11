@@ -5,6 +5,7 @@
     "sourceMap": true,
     "outDir": "dist",
     "baseUrl": ".",
+    "removeComments": true,
     "paths": {
       "*": ["node_modules/*"]
     }
