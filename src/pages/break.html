@@ -1,23 +1,28 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8" />
-    <title>Breakify</title>
-    <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
-    <meta
-      http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self'"
-    />
-    <meta
-      http-equiv="X-Content-Security-Policy"
-      content="default-src 'self'; script-src 'self'"
-    />
-  </head>
-  <body>
-    <h1>Take a break</h1>
-    <h1>Duration: <span id="duration"></span></h1>
 
-    <!-- You can also require other files to run in this process -->
-    <script src="../../dist/renderer.js"></script>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <title>Breakify</title>
+  <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'" />
+  <meta http-equiv="X-Content-Security-Policy" content="default-src 'self'; script-src 'self'" />
+
+  <link rel="stylesheet" href="style.css">
+
+
+</head>
+
+<body class="breakScreen">
+  <h1>Take a break</h1>
+
+  <progress id="progressBar" value="100" max="100"></progress>
+  <span id="progressTimeRemaining"></span>
+
+  <button id="finishBreakButton">Finish Break</button>
+
+  <!-- You can also require other files to run in this process -->
+  <script src="../../dist/break.js"></script>
+</body>
+
 </html>

@@ -1,4 +1,4 @@
-import { app, Tray, Menu, BrowserWindow } from "electron";
+import { app, Tray, Menu, BrowserWindow, ipcMain } from "electron";
 import * as path from "path";
 import { Break, Schedule, createBreakScheduler, BreakScheduler } from "./BreakScheduler"
 
@@ -10,6 +10,7 @@ let tray: Tray
 let backgroundWindow: BrowserWindow
 let settingsWindow: BrowserWindow
 let breakWindow: BrowserWindow
+let breakScheduler: BreakScheduler
 
 // Setup a Background Window. Keeps the app running in tray
 function createBackgroundWindow() {
@@ -41,7 +42,7 @@ function createBreaksWindow(duration: number) {
   // and load the index.html of the app.
   breakWindow.loadFile(path.join(__dirname, "../src/pages/break.html"));
 
-  //breakWindow.webContents.openDevTools();
+  breakWindow.webContents.openDevTools();
 
   // Wait for page to finish load before we can send data
   breakWindow.webContents.on('did-finish-load', () => {
@@ -84,7 +85,7 @@ function createSettingsWindow() {
 }
 
 function createTray() {
-  tray = new Tray(path.join(__dirname,'../assets/break.ico'))
+  tray = new Tray(path.join(__dirname, '../assets/break.ico'))
   const contextMenu = Menu.buildFromTemplate([
     {
       label: 'Settings', type: 'normal',
@@ -110,20 +111,30 @@ app.whenReady().then(() => {
 
   // Run the BreakScheduler
 
+
+
   let schedule: Schedule = {
-    shortBreak: { interval: 5, duration: 2, active: true },
-    mediumBreak: { interval: 15, duration: 4, active: false },
+    shortBreak: { interval: 3, duration: 5, active: true },
+    mediumBreak: { interval: 12, duration: 10, active: true },
     longBreak: { interval: 45, duration: 5, active: false },
   }
 
-  let breakScheduler : BreakScheduler = createBreakScheduler(
-    schedule,
+  let breakTimerConfig = {
+    schedule: schedule,
+    autoFinishBreak: false,
+  }
+
+  breakScheduler = createBreakScheduler(
+    breakTimerConfig.schedule,
     function startBreakcallback(duration: number) {
       createBreaksWindow(duration)
     },
     function stopBreakcallback() {
-      closeBreaksWindow()
-    }
+      if (breakTimerConfig.autoFinishBreak) {
+        closeBreaksWindow()
+      }
+    },
+    breakTimerConfig.autoFinishBreak
   )
 
   breakScheduler.startScheduler()
@@ -138,3 +149,9 @@ app.whenReady().then(() => {
 app.on("window-all-closed", () => {
   // Stay in tray
 });
+
+
+ipcMain.on('finishBreakButtonClicked', (event, arg) => {
+  closeBreaksWindow();
+  breakScheduler.restartScheduler();
+})

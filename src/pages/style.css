@@ -1,0 +1,9 @@
+.breakScreen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+body {
+    background-color: rgb(238, 195, 52);
+}
