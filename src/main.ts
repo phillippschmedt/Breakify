@@ -66,7 +66,7 @@ function createBreaksWindow(duration: number) {
 function closeBreaksWindow() {
   breakWindow.hide()
 }
-
+// TODO: Implement settings dialog
 // Setup the SettingsWindow
 function createSettingsWindow() {
   if (settingsWindow) {
@@ -96,6 +96,19 @@ function createTray() {
   tray = new Tray(path.join(__dirname, '../assets/break.ico'))
   const contextMenu = Menu.buildFromTemplate([
     {
+      label: 'Take next break', type: 'normal',
+      click: function () {
+        // TODO: Handle take next break
+      }
+    },
+    {
+      label: 'Pause Breaks', type: 'normal',
+      click: function () {
+        // TODO: Handle Pause Breaks
+      }
+    },
+    { type: 'separator' },
+    {
       label: 'Settings', type: 'normal',
       click: function () {
         createSettingsWindow();
@@ -109,17 +122,19 @@ function createTray() {
       }
     }
   ])
+
+  // TODO: Set Time to next breaks in tooltip?
   tray.setToolTip('Breakify - The break reminder app.')
   tray.setContextMenu(contextMenu)
 }
 
 app.whenReady().then(() => {
+  // TODO: Clean the initialization up
   settings = loadSettings()
-
   createBackgroundWindow();
   createTray();
 
-  // TODO: Make sure we at least have default settings.
+  // TODO: How do we handle the case when the config file got deleted?
   if (!settings) {
     console.log("Could not load config. Exiting app")
     app.quit()
