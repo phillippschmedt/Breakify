@@ -92,7 +92,6 @@ export function createBreakScheduler(schedule: Schedule, startBreakCallback: (du
         // Start break timer
         breakTimer = setTimeout(() => {
             breakDone()
-
         }, duration * 1000);
 
     }
@@ -141,6 +140,8 @@ export function createBreakScheduler(schedule: Schedule, startBreakCallback: (du
             this.stopScheduler()
             runScheduler()
         },
+
+        // TODO: URGENT: Implement getSecondsToNextBreak() - Either get time remaining on timer or store time when the timer started.
     }
 }
 
