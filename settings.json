@@ -1,0 +1,20 @@
+{
+  "schedule": {
+    "shortBreak": {
+      "interval": 3,
+      "duration": 5,
+      "active": true
+    },
+    "mediumBreak": {
+      "interval": 12,
+      "duration": 10,
+      "active": true
+    },
+    "longBreak": {
+      "interval": 45,
+      "duration": 5,
+      "active": false
+    }
+  },
+  "autoFinishBreak": false
+}
