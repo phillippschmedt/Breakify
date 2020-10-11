@@ -6,7 +6,7 @@
 // needed in the renderer process.
 
 // Let the UI start the break progress
-window.ipcRenderer.on('duration', function (event, durationInSeconds) {
+window.ipcRenderer.on('duration', function (event, durationInSeconds : number) {
 
     // The progressbar
     let progressBarElement = <HTMLProgressElement>document.getElementById("progressBar")
