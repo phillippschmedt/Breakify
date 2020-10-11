@@ -11,6 +11,13 @@ let backgroundWindow: BrowserWindow
 let settingsWindow: BrowserWindow
 let breakWindow: BrowserWindow
 let breakScheduler: BreakScheduler
+let settings: AppSettings | undefined
+
+declare global {
+  interface Window {
+    ipcRenderer: Electron.IpcRenderer
+  }
+}
 
 // Setup a Background Window. Keeps the app running in tray
 function createBackgroundWindow() {
