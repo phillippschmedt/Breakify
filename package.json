@@ -6,7 +6,7 @@
     "build": "tsc",
     "watch": "tsc -w",
     "lint": "tslint -c tslint.json -p tsconfig.json",
-    "start": "tsc && electron-forge start",
+    "start": "tsc && electron .",
     "package": "tsc && electron-forge package",
     "make": "tsc && electron-forge make"
   },
