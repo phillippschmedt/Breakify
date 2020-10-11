@@ -1,6 +1,7 @@
 import { app, Tray, Menu, BrowserWindow, ipcMain } from "electron";
 import * as path from "path";
 import { Break, Schedule, createBreakScheduler, BreakScheduler } from "./BreakScheduler"
+import { AppSettings, loadSettings } from "./settings-loader";
 
 try {
   require('electron-reloader')(module)
@@ -113,35 +114,31 @@ function createTray() {
 }
 
 app.whenReady().then(() => {
+  settings = loadSettings()
+
   createBackgroundWindow();
   createTray();
 
+  // TODO: Make sure we at least have default settings.
+  if (!settings) {
+    console.log("Could not load config. Exiting app")
+    app.quit()
+    return
+  }
+
   // Run the BreakScheduler
-
-  let schedule: Schedule = {
-    shortBreak: { interval: 3, duration: 5, active: true },
-    mediumBreak: { interval: 12, duration: 10, active: true },
-    longBreak: { interval: 45, duration: 5, active: false },
-  }
-
-  let breakTimerConfig = {
-    schedule: schedule,
-    autoFinishBreak: false,
-  }
-
   breakScheduler = createBreakScheduler(
-    breakTimerConfig.schedule,
+    settings.schedule,
     function startBreakcallback(duration: number) {
       createBreaksWindow(duration)
     },
     function stopBreakcallback() {
-
       // Only close the break window when the autoFinishBreak config is enabled.
-      if (breakTimerConfig.autoFinishBreak) {
+      if (settings?.autoFinishBreak) {
         closeBreaksWindow()
       }
     },
-    breakTimerConfig.autoFinishBreak
+    settings.autoFinishBreak
   )
 
   breakScheduler.startScheduler()
