@@ -2,6 +2,8 @@ import * as fs from 'fs';
 import * as path from "path";
 import { Schedule } from './BreakScheduler';
 
+// TODO: Eventually replace this all with electron-store because it also provides atomic writes
+
 export interface AppSettings {
     schedule: Schedule,
     autoFinishBreak: boolean
