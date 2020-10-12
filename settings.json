@@ -16,5 +16,6 @@
       "active": false
     }
   },
-  "autoFinishBreak": false
+  "autoFinishBreak": false,
+  "fullScreenBreaks" : true
 }

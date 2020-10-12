@@ -5,8 +5,9 @@ import { Schedule } from './BreakScheduler';
 // TODO: Eventually replace this all with electron-store because it also provides atomic writes
 
 export interface AppSettings {
-    schedule: Schedule,
+    schedule: Schedule
     autoFinishBreak: boolean
+    fullScreenBreaks : boolean
 }
 
 export function loadSettings(): AppSettings | undefined {

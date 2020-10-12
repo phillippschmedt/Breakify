@@ -20,16 +20,23 @@ declare global {
   }
 }
 
-// Setup a Background Window. Keeps the app running in tray
-function createBackgroundWindow() {
+// Runs on first load and makes sure all windows are setup for faster access.
+function initializeWindows() {
+  // Background window makes sure app keeps running in tray.
   backgroundWindow = new BrowserWindow({
     show: false,
   });
+
+  // Initialize Breakswindow during app start for better user experience
+  createBreaksWindowIfNotExist();
+
 }
 
-// Setup BreakWindow
-function createBreaksWindow(duration: number) {
-  if (!breakWindow) {
+// Creates a new breakWindow if one does not exist. Force parameter can force the creation of a new window. 
+function createBreaksWindowIfNotExist(force? : boolean) {
+
+  // TODO: Get rid of the force parameter
+  if (!breakWindow || force ) {
     breakWindow = new BrowserWindow({
       height: 600,
       webPreferences: {
@@ -37,7 +44,7 @@ function createBreaksWindow(duration: number) {
       },
       width: 800,
       frame: false,
-      fullscreen: false,
+      fullscreen: settings?.fullScreenBreaks,
       autoHideMenuBar: true,
       show: false,
     });
@@ -48,8 +55,18 @@ function createBreaksWindow(duration: number) {
     // TODO: Test if this is really needed for mac
     // Remove menu (and reload hotkey) on mac
     breakWindow.setMenu(Menu.buildFromTemplate([]))
-  }
 
+    // This is triggered when the user force closes the breaks window (e.g. ALT+F4 on Windows). 
+    // Since the breakScheduler pauses during the breaks window we need to restart it. 
+    breakWindow.on('close', () => {
+      // We immediately create a new breaksWindow to make sure we are prepared for the next break.
+      createBreaksWindowIfNotExist(true)
+      breakScheduler.restartScheduler();
+    })
+  }
+}
+
+function startBreak(duration: number) {
   breakWindow.loadFile(path.join(__dirname, "../src/pages/break.html"));
 
   //breakWindow.webContents.openDevTools();
@@ -146,7 +163,7 @@ function updateTray() {
 app.whenReady().then(() => {
   // TODO: Clean the initialization up
   settings = loadSettings()
-  createBackgroundWindow();
+  initializeWindows();
   createTray();
 
   // TODO: How do we handle the case when the config file got deleted?
@@ -162,7 +179,7 @@ app.whenReady().then(() => {
     // Called when a break starts
     function startBreakcallback(duration: number) {
       updateTray();
-      createBreaksWindow(duration)
+      startBreak(duration)
     },
     // Called when a break ends
     function stopBreakcallback() {
@@ -190,7 +207,7 @@ app.whenReady().then(() => {
   app.on("activate", function () {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
-    if (BrowserWindow.getAllWindows().length === 0) createBackgroundWindow();
+    if (BrowserWindow.getAllWindows().length === 0) initializeWindows();
   });
 })
 
@@ -207,7 +224,7 @@ ipcMain.on('finishBreakButtonClicked', (event, arg) => {
 
 // Better exception handling / Will log to console instead of displaying eror dialog.
 process.on('uncaughtException', error => {
-	// Replace code below to display a prettier window
-	console.error('Exception:', error); 
-	app.exit(1);
+  // Replace code below to display a prettier window
+  console.error('Exception:', error);
+  app.exit(1);
 });
