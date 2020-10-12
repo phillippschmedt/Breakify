@@ -41,6 +41,13 @@ function createBreaksWindow(duration: number) {
       autoHideMenuBar: true,
       show: false,
     });
+
+    // Remove menu (and reload hotkey) on windows
+    breakWindow.removeMenu()
+
+    // TODO: Test if this is really needed for mac
+    // Remove menu (and reload hotkey) on mac
+    breakWindow.setMenu(Menu.buildFromTemplate([]))
   }
 
   breakWindow.loadFile(path.join(__dirname, "../src/pages/break.html"));
