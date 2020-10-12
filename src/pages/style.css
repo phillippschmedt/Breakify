@@ -11,3 +11,7 @@ body {
     justify-content: center;
     height: 600px; 
 }
+
+.noselect {
+    user-select: none;
+  }
