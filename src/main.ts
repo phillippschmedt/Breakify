@@ -29,25 +29,20 @@ function createBackgroundWindow() {
 
 // Setup BreakWindow
 function createBreaksWindow(duration: number) {
-  if (breakWindow) {
-    breakWindow.show()
-    breakWindow.webContents.send('ipc_startbreak', duration);
-    return
+  if (!breakWindow) {
+    breakWindow = new BrowserWindow({
+      height: 600,
+      webPreferences: {
+        preload: path.join(__dirname, "preload.js"),
+      },
+      width: 800,
+      frame: false,
+      fullscreen: false,
+      autoHideMenuBar: true,
+      show: false,
+    });
   }
 
-  breakWindow = new BrowserWindow({
-    height: 600,
-    webPreferences: {
-      preload: path.join(__dirname, "preload.js"),
-    },
-    width: 800,
-    frame: false,
-    fullscreen: false,
-    autoHideMenuBar: true,
-    show: false,
-  });
-
-  // and load the index.html of the app.
   breakWindow.loadFile(path.join(__dirname, "../src/pages/break.html"));
 
   //breakWindow.webContents.openDevTools();
