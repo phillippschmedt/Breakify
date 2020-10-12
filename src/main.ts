@@ -93,11 +93,12 @@ function createTray() {
   // TODO: Set Time to next breaks in tooltip?
   tray.setToolTip('Breakify - The break reminder app.')
 
-  updateTrayMenu();
+  updateTray();
 }
 
-function updateTrayMenu() {
 
+// Used to dynamically update the tray window. Note: Electron forces us to create a new menu every time we want to change it. 
+function updateTray() {
   let contextMenu = Menu.buildFromTemplate([
     {
       label: 'Take next break', type: 'normal',
@@ -105,6 +106,7 @@ function updateTrayMenu() {
         breakScheduler.skipToNextBreak();
       }
     },
+    { type: 'separator' },
     {
       label: breakScheduler?.isRunning() ? 'Pause Breaks' : 'Resume Breaks', type: 'normal',
       click: function () {
@@ -151,7 +153,7 @@ app.whenReady().then(() => {
   breakScheduler = createBreakScheduler(
     settings.schedule,
     function startBreakcallback(duration: number) {
-      updateTrayMenu();
+      updateTray();
       createBreaksWindow(duration)
     },
     function stopBreakcallback() {
@@ -159,20 +161,20 @@ app.whenReady().then(() => {
       if (settings?.autoFinishBreak) {
         closeBreaksWindow()
       }
-      updateTrayMenu();
+      updateTray();
     },
     function schedulerStartedCallback() {
-      updateTrayMenu();
+      updateTray();
     },
     function schedulerStoppedCallback() {
-      updateTrayMenu();
+      updateTray();
       closeBreaksWindow();
     },
     settings.autoFinishBreak
   )
 
   breakScheduler.startScheduler()
-  updateTrayMenu();
+  updateTray();
 
   app.on("activate", function () {
     // On macOS it's common to re-create a window in the app when the
