@@ -152,10 +152,12 @@ app.whenReady().then(() => {
   // Run the BreakScheduler
   breakScheduler = createBreakScheduler(
     settings.schedule,
+    // Called when a break starts
     function startBreakcallback(duration: number) {
       updateTray();
       createBreaksWindow(duration)
     },
+    // Called when a break ends
     function stopBreakcallback() {
       // Only close the break window when the autoFinishBreak config is enabled.
       if (settings?.autoFinishBreak) {
@@ -163,9 +165,11 @@ app.whenReady().then(() => {
       }
       updateTray();
     },
+    // Called when the scheduler is started
     function schedulerStartedCallback() {
       updateTray();
     },
+    // Called when the scheduler is stopped
     function schedulerStoppedCallback() {
       updateTray();
       closeBreaksWindow();
