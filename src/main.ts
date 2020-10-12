@@ -5,7 +5,7 @@ import { AppSettings, loadSettings } from "./settings-loader";
 
 try {
   require('electron-reloader')(module)
-} catch (_) { }  // replace with modern JS
+} catch (_) { }  // TODO: replace with modern JS
 
 let tray: Tray
 let backgroundWindow: BrowserWindow
