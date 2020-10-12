@@ -7,7 +7,6 @@
 
 // Let the UI start the break progress
 window.ipcRenderer.on('ipc_startbreak', function (event, durationInSeconds: number) {
-
     // The progressbar
     let progressBarElement = <HTMLProgressElement>document.getElementById("progressBar")
 
@@ -29,6 +28,10 @@ window.ipcRenderer.on('ipc_startbreak', function (event, durationInSeconds: numb
 
     // We remember the time at which we started the timer to calculate the seconds since then.
     let startedTime = Date.now();
+
+    // Set initial time remaining
+    // TODO: Properly Format time String (Seconds, Minutes, Hours)
+    timeRemainingElement.innerHTML = durationInSeconds + " seconds remaining"
 
     let progressIntervalTimer = window.setInterval(() => {
         progressBarElement.value = progress;
