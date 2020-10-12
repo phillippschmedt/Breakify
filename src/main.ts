@@ -203,3 +203,11 @@ ipcMain.on('finishBreakButtonClicked', (event, arg) => {
   closeBreaksWindow();
   breakScheduler.restartScheduler();
 })
+
+
+// Better exception handling / Will log to console instead of displaying eror dialog.
+process.on('uncaughtException', error => {
+	// Replace code below to display a prettier window
+	console.error('Exception:', error); 
+	app.exit(1);
+});
