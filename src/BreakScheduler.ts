@@ -15,6 +15,8 @@ export interface BreakScheduler {
     stopScheduler(): void,
     restartScheduler(): void,
     skipToNextBreak(): void,
+    timeToNextBreak(): number,
+    isIntervalRunning(): boolean
 }
 /**
  * Factory Method to create a BreakScheduler
@@ -42,10 +44,19 @@ export function createBreakScheduler(schedule: Schedule, startBreakCallback: (du
     let intervalCounter: number = shortestInterval
     let intervalTimer: NodeJS.Timeout
     let breakTimer: NodeJS.Timeout
+    let invertalStatedAt: number
+    let isIntervalRunning: boolean = false
 
     function runScheduler(): void {
         console.log("Next break in: " + shortestInterval)
+
+        isIntervalRunning = true;
+
+        // Remember when we started the current interval so we can show the time till next break.
+        invertalStatedAt = Date.now()
+
         intervalTimer = setTimeout(() => {
+            isIntervalRunning = false
             startNextBreak()
         }, shortestInterval * 1000);
     }
@@ -123,6 +134,9 @@ export function createBreakScheduler(schedule: Schedule, startBreakCallback: (du
 
         stopScheduler() {
             console.log("Stopping scheduler")
+
+            isIntervalRunning = false
+
             if (intervalTimer) {
                 clearTimeout(intervalTimer)
                 clearTimeout(breakTimer)
@@ -141,7 +155,18 @@ export function createBreakScheduler(schedule: Schedule, startBreakCallback: (du
             runScheduler()
         },
 
-        // TODO: URGENT: Implement getSecondsToNextBreak() - Either get time remaining on timer or store time when the timer started.
+        timeToNextBreak() {
+            if (isIntervalRunning) {
+                return Math.ceil((shortestInterval - (Date.now() - invertalStatedAt) / 1000))
+            }
+
+            // If it's not running the time to next break is 0
+            return 0;
+        },
+
+        isIntervalRunning() {
+            return isIntervalRunning
+        }
     }
 }
 

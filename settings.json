@@ -1,7 +1,7 @@
 {
   "schedule": {
     "shortBreak": {
-      "interval": 3,
+      "interval": 5,
       "duration": 5,
       "active": true
     },
