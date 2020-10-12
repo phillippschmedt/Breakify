@@ -54,12 +54,10 @@ function createBreaksWindow(duration: number) {
     // Show window when we are done with all rendering. Looks more fluid.
     breakWindow.show()
   })
-
-
 }
 
 function closeBreaksWindow() {
-  breakWindow.hide()
+  breakWindow?.hide()
 }
 // TODO: Implement settings dialog
 // Setup the SettingsWindow
@@ -88,18 +86,34 @@ function createSettingsWindow() {
 }
 
 function createTray() {
-  tray = new Tray(path.join(__dirname, '../assets/break.ico'))
-  const contextMenu = Menu.buildFromTemplate([
+  if (!tray) {
+    tray = new Tray(path.join(__dirname, '../assets/break.ico'))
+  }
+
+  // TODO: Set Time to next breaks in tooltip?
+  tray.setToolTip('Breakify - The break reminder app.')
+
+  updateTrayMenu();
+}
+
+function updateTrayMenu() {
+
+  let contextMenu = Menu.buildFromTemplate([
     {
       label: 'Take next break', type: 'normal',
       click: function () {
-        // TODO: Handle take next break
+        breakScheduler.skipToNextBreak();
       }
     },
     {
-      label: 'Pause Breaks', type: 'normal',
+      label: breakScheduler?.isRunning() ? 'Pause Breaks' : 'Resume Breaks', type: 'normal',
       click: function () {
-        // TODO: Handle Pause Breaks
+        if (breakScheduler.isRunning()) {
+          breakScheduler.stopScheduler();
+        } else {
+          breakScheduler.startScheduler();
+        }
+
       }
     },
     { type: 'separator' },
@@ -117,9 +131,6 @@ function createTray() {
       }
     }
   ])
-
-  // TODO: Set Time to next breaks in tooltip?
-  tray.setToolTip('Breakify - The break reminder app.')
   tray.setContextMenu(contextMenu)
 }
 
@@ -140,6 +151,7 @@ app.whenReady().then(() => {
   breakScheduler = createBreakScheduler(
     settings.schedule,
     function startBreakcallback(duration: number) {
+      updateTrayMenu();
       createBreaksWindow(duration)
     },
     function stopBreakcallback() {
@@ -147,12 +159,20 @@ app.whenReady().then(() => {
       if (settings?.autoFinishBreak) {
         closeBreaksWindow()
       }
+      updateTrayMenu();
+    },
+    function schedulerStartedCallback() {
+      updateTrayMenu();
+    },
+    function schedulerStoppedCallback() {
+      updateTrayMenu();
+      closeBreaksWindow();
     },
     settings.autoFinishBreak
   )
 
   breakScheduler.startScheduler()
-
+  updateTrayMenu();
 
   app.on("activate", function () {
     // On macOS it's common to re-create a window in the app when the

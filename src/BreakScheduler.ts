@@ -16,7 +16,7 @@ export interface BreakScheduler {
     restartScheduler(): void,
     skipToNextBreak(): void,
     timeToNextBreak(): number,
-    isIntervalRunning(): boolean
+    isRunning(): boolean
 }
 /**
  * Factory Method to create a BreakScheduler
@@ -25,7 +25,7 @@ export interface BreakScheduler {
  * @param  {Function}  stopBreakCallback
  * @return {BreakScheduler}  Returns a breakscheduler
  */
-export function createBreakScheduler(schedule: Schedule, startBreakCallback: (duration: number) => void, stopBreakCallback: () => void, autoStartNextInterval = true): BreakScheduler {
+export function createBreakScheduler(schedule: Schedule, startBreakCallback: (duration: number) => void, stopBreakCallback: () => void, schedulerStartedCallback: () => void, schedulerStoppedCallback: () => void, autoStartNextInterval = true): BreakScheduler {
 
     // Makes sure schedule has at least one active break
     // Then calculates the shortestInterval
@@ -44,19 +44,17 @@ export function createBreakScheduler(schedule: Schedule, startBreakCallback: (du
     let intervalCounter: number = shortestInterval
     let intervalTimer: NodeJS.Timeout
     let breakTimer: NodeJS.Timeout
-    let invertalStatedAt: number
-    let isIntervalRunning: boolean = false
+    let intervalStartedAt: number
+    let isRunning: boolean = false
 
     function runScheduler(): void {
         console.log("Next break in: " + shortestInterval)
-
-        isIntervalRunning = true;
+        schedulerStartedCallback();
 
         // Remember when we started the current interval so we can show the time till next break.
-        invertalStatedAt = Date.now()
+        intervalStartedAt = Date.now()
 
         intervalTimer = setTimeout(() => {
-            isIntervalRunning = false
             startNextBreak()
         }, shortestInterval * 1000);
     }
@@ -129,18 +127,23 @@ export function createBreakScheduler(schedule: Schedule, startBreakCallback: (du
     return {
         startScheduler() {
             console.log("Starting scheduler")
+            isRunning = true
+
             runScheduler()
         },
-
+        // TODO: Move some parts to private method, just like runScheduler()/startScheduler(9)
         stopScheduler() {
             console.log("Stopping scheduler")
 
-            isIntervalRunning = false
+            isRunning = false
 
             if (intervalTimer) {
                 clearTimeout(intervalTimer)
                 clearTimeout(breakTimer)
             }
+
+            // Notify callbacks that we stopped the scheduler
+            schedulerStoppedCallback()
         },
 
         skipToNextBreak() {
@@ -152,20 +155,19 @@ export function createBreakScheduler(schedule: Schedule, startBreakCallback: (du
         restartScheduler() {
             console.log("Restarting scheduler")
             this.stopScheduler()
-            runScheduler()
+            this.startScheduler();
         },
 
         timeToNextBreak() {
-            if (isIntervalRunning) {
-                return Math.ceil((shortestInterval - (Date.now() - invertalStatedAt) / 1000))
+            if (isRunning) {
+                return Math.ceil((shortestInterval - (Date.now() - intervalStartedAt) / 1000))
             }
-
             // If it's not running the time to next break is 0
             return 0;
         },
 
-        isIntervalRunning() {
-            return isIntervalRunning
+        isRunning() {
+            return isRunning
         }
     }
 }
