@@ -50,7 +50,7 @@ window.ipcRenderer.on('ipc_startbreak', function (event, durationInSeconds: numb
             clearInterval(progressIntervalTimer);
         }
 
-    }, 100)
+    }, 100) 
 
     finishBreakButton.addEventListener('click', () => {
         // Stop progressbar updates
