@@ -13,6 +13,7 @@ let settingsWindow: BrowserWindow
 let breakWindow: BrowserWindow
 let breakScheduler: BreakScheduler
 let settings: AppSettings | undefined
+let appIsShuttingDown = false
 
 declare global {
   interface Window {
@@ -33,10 +34,10 @@ function initializeWindows() {
 }
 
 // Creates a new breakWindow if one does not exist. Force parameter can force the creation of a new window. 
-function createBreaksWindowIfNotExist(force? : boolean) {
+function createBreaksWindowIfNotExist(force?: boolean) {
 
   // TODO: Get rid of the force parameter
-  if (!breakWindow || force ) {
+  if (!breakWindow || force) {
     breakWindow = new BrowserWindow({
       height: 600,
       webPreferences: {
@@ -60,7 +61,11 @@ function createBreaksWindowIfNotExist(force? : boolean) {
     // Since the breakScheduler pauses during the breaks window we need to restart it. 
     breakWindow.on('close', () => {
       // We immediately create a new breaksWindow to make sure we are prepared for the next break.
-      createBreaksWindowIfNotExist(true)
+      // In case the user exists the app from tray icon, we don't want to create a new window because the user is shutting down the app anyway.breakScreen
+      // Creating a new window would interrupt the shutdown process.
+      if (!appIsShuttingDown) {
+        createBreaksWindowIfNotExist(true)
+      }
       breakScheduler.restartScheduler();
     })
   }
@@ -153,6 +158,7 @@ function updateTray() {
     {
       label: 'Exit',
       type: 'normal', click: function () {
+        appIsShuttingDown = true
         app.quit()
       }
     }
