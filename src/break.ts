@@ -45,10 +45,11 @@ window.ipcRenderer.on('ipc_startbreak', function (event, durationInSeconds: numb
         // TODO: Properly Format time String (Seconds, Minutes, Hours)
         timeRemainingElement.innerHTML = (Math.ceil(timeRemainingInSeconds)).toString() + " seconds remaining"
 
-        if (progress == 0) {
+        if (progress <= 0) {
             finishBreakButton.innerHTML = "Finish Break";
             clearInterval(progressIntervalTimer);
         }
+
     }, 100)
 
     finishBreakButton.addEventListener('click', () => {
