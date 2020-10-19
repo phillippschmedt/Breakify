@@ -1,39 +1,37 @@
 import React from 'react';
-import Button from '@material-ui/core/Button';
-import Container from '@material-ui/core/Container';
 import Slider from "@material-ui/core/Slider"
 import Typography from "@material-ui/core/Typography"
-import Input from "@material-ui/core/Input"
 
 function IntervalSlider(props) {
 
-  var sbIntervalRange = [5, 10, 15, 20, 25, 30, 40, 50, 60, 90, 120, 150, 180, 210, 240, 270, 300, 360, 420, 480, 540, 600]
-
-  function getShortBreakIntervalRange(x) {
-    return sbIntervalRange[x]
-  }
-
   function formatTimeString(x) {
+    
+    // return x
     if (x >= 60) {
       return (x / 60).toString() + " Minutes"
     }
     return x.toString() + " Seconds"
   }
 
+  function onChangeHandler(mouseMoveEvent, value) {
+    const name = props.name
+    mouseMoveEvent.name = name
+    props.onChange(mouseMoveEvent, value)
+  }
 
   return (
     <div>
       <Typography id="discrete-slider-custom" gutterBottom>
-        {props.label}: {formatTimeString(getShortBreakIntervalRange(props.value))}
+        {props.label}: {formatTimeString(props.range[props.value])}
       </Typography>
       <Slider
-        defaultValue={3}
+        name={props.name}
         step={1}
-        marks
-        scale={(x) => getShortBreakIntervalRange(x)}
+        scale={(x) => props.range[x]}
         min={0}
-        max={21}
-        onChange={props.onChange}
+        value={props.value}
+        max={props.range.length - 1}
+        onChange={onChangeHandler}
       />
     </div>
   );
