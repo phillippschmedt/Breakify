@@ -1,4 +1,5 @@
 <h1 align="center">⚡️ Breakify</h1>
+> **Breakify is an electron based cross-platform break reminder app**
 
 **⚠️ Work in Progress ⚠️**
 
