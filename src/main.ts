@@ -118,11 +118,11 @@ function createSettingsWindow() {
   //mainWindow.webContents.openDevTools();
 
   // Is run when closing the window
-  settingsWindow.on('close', (e) => {
+  settingsWindow.on('close', (event) => {
     // If the close is part of an app shutdown we don't want to stop it
     if (!appIsShuttingDown) {
       // If the window close is not part of an shutdown, we want to hide the window instead of destroying it.
-      e.preventDefault()
+      event.preventDefault()
       settingsWindow.hide()
     }
   })
