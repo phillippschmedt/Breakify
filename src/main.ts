@@ -3,10 +3,6 @@ import * as path from "path";
 import { Break, Schedule, createBreakScheduler, BreakScheduler } from "./BreakScheduler"
 import { AppSettings, loadSettings } from "./settings-loader";
 
-try {
-  require('electron-reloader')(module)
-} catch (_) { }  // TODO: replace with modern JS
-
 let tray: Tray
 let backgroundWindow: BrowserWindow
 let settingsWindow: BrowserWindow
@@ -14,6 +10,8 @@ let breakWindow: BrowserWindow
 let breakScheduler: BreakScheduler
 let settings: AppSettings | undefined
 let appIsShuttingDown = false
+
+const isDev = require('electron-is-dev');
 
 declare global {
   interface Window {
@@ -108,10 +106,26 @@ function createSettingsWindow() {
   });
 
   // and load the index.html of the app.
-  settingsWindow.loadFile(path.join(__dirname, "../src/pages/settings.html"));
+
+  settingsWindow.loadURL(
+    // When we run electron in dev, we want to include the create-react-app server for live relaod. Otherwise take the compiled files.
+    isDev
+      ? "http://localhost:3000"
+      : `file://${path.join(__dirname, "../src/pages/settings.html")}`
+  );
 
   // Open the DevTools.
   //mainWindow.webContents.openDevTools();
+
+  // Is run when closing the window
+  settingsWindow.on('close', (e) => {
+    // If the close is part of an app shutdown we don't want to stop it
+    if (!appIsShuttingDown) {
+      // If the window close is not part of an shutdown, we want to hide the window instead of destroying it.
+      e.preventDefault()
+      settingsWindow.hide()
+    }
+  })
 }
 
 function createTray() {
