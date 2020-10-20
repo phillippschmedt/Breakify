@@ -1,12 +1,9 @@
 import React from 'react';
-import Slider from "@material-ui/core/Slider"
-import Typography from "@material-ui/core/Typography"
+import { Typography, Grid, Slider } from "@material-ui/core"
 
 function IntervalSlider(props) {
 
   function formatTimeString(x) {
-    
-    // return x
     if (x >= 60) {
       return (x / 60).toString() + " Minutes"
     }
@@ -21,18 +18,26 @@ function IntervalSlider(props) {
 
   return (
     <div>
-      <Typography id="discrete-slider-custom" gutterBottom>
-        {props.label}: {formatTimeString(props.range[props.value])}
-      </Typography>
-      <Slider
-        name={props.name}
-        step={1}
-        scale={(x) => props.range[x]}
-        min={0}
-        value={props.value}
-        max={props.range.length - 1}
-        onChange={onChangeHandler}
-      />
+      <Grid container spacing={2} alignItems="center">
+        <Grid item xs>
+          <Typography id="discrete-slider-custom" gutterBottom>
+            {props.label}
+          </Typography>
+        </Grid>
+        <Grid item xs>
+          <Slider
+            name={props.name}
+            step={props.step}
+            min={props.min}
+            value={props.value}
+            max={props.max}
+            onChange={onChangeHandler}
+          />
+        </Grid>
+        <Grid item xs>        <Typography>
+          {formatTimeString(props.value)}
+        </Typography></Grid>
+      </Grid>
     </div>
   );
 }

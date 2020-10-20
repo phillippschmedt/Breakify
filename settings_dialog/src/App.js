@@ -2,113 +2,122 @@ import React from 'react';
 import Container from '@material-ui/core/Container';
 import IntervalSlider from './IntervalSlider';
 import merge from 'lodash/merge'
-import range from 'lodash/range'
-import { Typography } from '@material-ui/core';
+import { Switch, FormControlLabel } from '@material-ui/core';
 
 function App() {
   const [state, setState] = React.useState({
-    shortBreak: {
-      breakIntervalRange: range(300, 13 * 300, 300),
-      breakInterval: 0,
+    "schedule": {
+      "shortBreak": {
+        "interval": 60,
+        "duration": 5,
+        "active": true
+      },
+      "mediumBreak": {
+        "interval": 120,
+        "duration": 10,
+        "active": true
+      },
+      "longBreak": {
+        "interval": 240,
+        "duration": 5,
+        "active": false
+      }
     },
-    mediumBreak: {
-      breakIntervalRange: range(2 * 300, 2 * 13 * 300, 300),
-      breakInterval: 0,
-    },
-    longBreak: {
-      breakIntervalRange: range(4 * 300, 4 * 13 * 300, 4 * 300),
-      breakInterval: 0,
-    },
+    "autoFinishBreak": false,
+    "fullScreenBreaks": true
   });
 
-  function handleBreakInterval(event, value) {
-    if (state[event.name].breakInterval !== value) {
-
-      var stateChanges = {
+  // Handle short slider changes
+  function onChangeHandler(event, value) {
+    // Set value of current slider
+    let stateChanges = {
+      schedule: {
         [event.name]: {
-          breakInterval: value
+          interval: value
         },
-      }
-
-      if (event.name === "shortBreak") {
-
-        // Update Medium Slider
-        const newShortBreakIntervalInSeconds = state.shortBreak.breakIntervalRange[value];
-
-        var newMediumIntervalRange = getNextRange(newShortBreakIntervalInSeconds)
-
-        stateChanges.mediumBreak = {
-          breakIntervalRange: newMediumIntervalRange,
-        }
-
-        // Update Long Slider
-        const newMediumBreakIntervalInSeconds = newMediumIntervalRange[state.mediumBreak.breakInterval]
-
-        var newLongIntervalRange = getNextRange(newMediumBreakIntervalInSeconds)
-
-        stateChanges.longBreak = {
-          breakIntervalRange: newLongIntervalRange,
-        }
-
-      }
-
-      if (event.name === "mediumBreak") {
-        // Update Long Slider
-        const newMediumBreakIntervalInSeconds = state.mediumBreak.breakIntervalRange[value];
-
-        var newLongIntervalRange = getNextRange(newMediumBreakIntervalInSeconds)
-
-        stateChanges.longBreak = {
-          breakIntervalRange: newLongIntervalRange,
-        }
       }
     }
 
-    function getNextRange(breakIntervalInSeconds) {
-      const newStartInterval = 2 * breakIntervalInSeconds
-      const newStopInterval = 2 * 13 * breakIntervalInSeconds
-      const newStep = breakIntervalInSeconds
-      return range(newStartInterval, newStopInterval, newStep)
+    if (event.name !== "mediumBreak" && event.name !== "longBreak") {
+      // Set the medium sliders value based on the current ratio between medium and short slider
+      let mediumToShortRadio = state.schedule.mediumBreak.interval / state.schedule.shortBreak.interval
+      stateChanges.schedule.mediumBreak = {
+        interval: mediumToShortRadio * value
+      }
+    }
+
+    if (event.name !== "longBreak") {
+      // Set the long sliders value based on the current ratio between long and medium slider
+      let longToShortRadio = state.schedule.longBreak.interval / state.schedule.mediumBreak.interval
+      stateChanges.schedule.longBreak = {
+        interval: longToShortRadio * stateChanges.schedule.mediumBreak.interval
+      }
     }
 
     var newState = merge({}, state, stateChanges)
     setState(newState)
   }
 
+  function toggleFullScreenSwitch() {
+    var newState = {
+      fullScreenBreaks: !state.fullScreenBreaks
+    }
+    setState(merge({}, state, newState))
+  }
+
+  function toggleAutoFinishBreak() {
+    var newState = {
+      autoFinishBreak: !state.autoFinishBreak
+    }
+    setState(merge({}, state, newState))
+  }
+
   return (
     <>
       <Container maxWidth="sm">
-        <Typography
-          variant="h6"
-          gutterBottom>A short break is meant for a short strech or eye-rest</Typography>
+        
+        <FormControlLabel
+          label="Show breaks in fullscreen"
+          control={
+            <Switch color="primary" checked={state.fullScreenBreaks} onChange={toggleFullScreenSwitch} />}
+
+        />
+
+        <FormControlLabel
+          label="Automatically finish break when time isup"
+          control={
+            <Switch color="primary" checked={state.autoFinishBreak} onChange={toggleAutoFinishBreak} />}
+
+        />
+
         <IntervalSlider
           name="shortBreak"
           label="Short Break Interval"
-          value={state.shortBreak.breakInterval}
-          onChange={handleBreakInterval}
-          range={state.shortBreak.breakIntervalRange}
+          step={60}
+          min={60}
+          value={state.schedule.shortBreak.interval}
+          max={13 * 60}
+          onChange={onChangeHandler}
         />
 
-        <Typography
-          variant="h6"
-          gutterBottom>A medium break is meant to get you stand up and moving.</Typography>
         <IntervalSlider
           name="mediumBreak"
           label="Medium Break Interval"
-          value={state.mediumBreak.breakInterval}
-          onChange={handleBreakInterval}
-          range={state.mediumBreak.breakIntervalRange}
+          step={2 * state.schedule.shortBreak.interval}
+          min={2 * state.schedule.shortBreak.interval}
+          value={state.schedule.mediumBreak.interval}
+          max={2 * 13 * state.schedule.shortBreak.interval}
+          onChange={onChangeHandler}
         />
 
-        <Typography
-          variant="h6"
-          gutterBottom>A long break is a serious break and time off your computer. It should be at least 15 minutes.</Typography>
         <IntervalSlider
           name="longBreak"
           label="Long Break Interval"
-          value={state.longBreak.breakInterval}
-          onChange={handleBreakInterval}
-          range={state.longBreak.breakIntervalRange}
+          step={2 * state.schedule.mediumBreak.interval}
+          min={2 * state.schedule.mediumBreak.interval}
+          value={state.schedule.longBreak.interval}
+          max={2 * 13 * state.schedule.mediumBreak.interval}
+          onChange={onChangeHandler}
         />
       </Container>
 
