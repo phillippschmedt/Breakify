@@ -5,6 +5,7 @@ Taking regular breaks is important for your health. Breakify will make sure you 
 **Work in Progress**
 
 <h2>Stack:</h2>
+
 * Electron
 * TypeScript
 * React
