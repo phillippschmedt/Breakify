@@ -1,7 +1,7 @@
 {
-  "name": "break",
+  "name": "Breakify",
   "version": "1.0.0",
-  "description": "A minimal app reminding you to take a break. Take your health seriously!",
+  "description": "Breakify is an electron based cross-platform break reminder app",
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w",
@@ -11,7 +11,7 @@
     "package": "tsc && electron-forge package",
     "make": "tsc && electron-forge make"
   },
-  "repository": "https://github.com/phillippschmedt/break",
+  "repository": "https://github.com/phillippschmedt/Breakify",
   "author": "Phillipp Schmedt",
   "devDependencies": {
     "@electron-forge/cli": "^6.0.0-beta.53",
