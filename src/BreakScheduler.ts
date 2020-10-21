@@ -1,3 +1,6 @@
+import { settings } from "cluster"
+import { Settings } from "http2"
+
 export interface Break {
     interval: number,
     duration: number,
@@ -13,7 +16,7 @@ export interface Schedule {
 export interface BreakScheduler {
     startScheduler(): void,
     stopScheduler(): void,
-    restartScheduler(): void,
+    restartScheduler(newSchedule? : Schedule): void,
     skipToNextBreak(): void,
     timeToNextBreak(): number,
     isRunning(): boolean
@@ -31,21 +34,28 @@ export function createBreakScheduler(schedule: Schedule, startBreakCallback: (du
     // Then calculates the shortestInterval
     let shortestInterval: number
 
-    if (schedule.shortBreak?.active) {
-        shortestInterval = schedule.shortBreak.interval
-    } else if (schedule.mediumBreak?.active) {
-        shortestInterval = schedule.mediumBreak.interval
-    } else if (schedule.longBreak?.active) {
-        shortestInterval = schedule.longBreak.interval
-    } else {
-        throw "Error: createBreakScheduler() - Schedule has no active"
-    }
 
-    let intervalCounter: number = shortestInterval
+    let intervalCounter: number
     let intervalTimer: NodeJS.Timeout
     let breakTimer: NodeJS.Timeout
     let intervalStartedAt: number
-    let isRunning: boolean = false
+    let isRunning: boolean
+
+    initialize(schedule);
+
+    function initialize(schedule: Schedule) {
+        if (schedule.shortBreak?.active) {
+            shortestInterval = schedule.shortBreak.interval
+        } else if (schedule.mediumBreak?.active) {
+            shortestInterval = schedule.mediumBreak.interval
+        } else if (schedule.longBreak?.active) {
+            shortestInterval = schedule.longBreak.interval
+        } else {
+            throw "Error: createBreakScheduler() - Schedule has no active"
+        }
+        intervalCounter = shortestInterval
+        isRunning = false
+    }
 
     function runScheduler(): void {
         console.log("Next break in: " + shortestInterval)
@@ -80,13 +90,13 @@ export function createBreakScheduler(schedule: Schedule, startBreakCallback: (du
         // Move to next interval
         intervalCounter += shortestInterval
 
-        // Start the next interval
+        // This parameter is used when the user sets "auto start next interval when break is over"
+        // TODO: We currently have this check at two places. In here and in the main.js where it makes sure the that break window doesn't close. 
         if (autoStartNextInterval) {
             runScheduler()
         } else {
             console.log("Stopping scheduler because autoStart is disabled.")
         }
-
     }
 
     function startNextBreak(): void {
@@ -105,6 +115,8 @@ export function createBreakScheduler(schedule: Schedule, startBreakCallback: (du
 
     }
 
+
+    // Returns the duration of the next break
     function calculateNextBreak(): number {
         // Long Break
         let longBreak = getLongBreak()
@@ -152,7 +164,11 @@ export function createBreakScheduler(schedule: Schedule, startBreakCallback: (du
             startNextBreak()
         },
 
-        restartScheduler() {
+        restartScheduler(newSchedule?: Schedule) {
+            // If a new schedule is submitted, we will run the scheduler with that one.
+            if (newSchedule) {
+                initialize(newSchedule)
+            }
             console.log("Restarting scheduler")
             this.stopScheduler()
             this.startScheduler();

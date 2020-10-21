@@ -72,54 +72,66 @@ function App() {
     setState(merge({}, state, newState))
   }
 
+  function handleSubmit(event) {
+    console.log(state);
+    window.ipcRenderer.send('settingsSaved', state)
+    event.preventDefault();
+  }
+
   return (
     <>
       <Container maxWidth="sm">
-        
-        <FormControlLabel
-          label="Show breaks in fullscreen"
-          control={
-            <Switch color="primary" checked={state.fullScreenBreaks} onChange={toggleFullScreenSwitch} />}
 
-        />
+        <form onSubmit={handleSubmit}>
+          <FormControlLabel
+            label="Show breaks in fullscreen"
+            control={
+              <Switch color="primary" checked={state.fullScreenBreaks} onChange={toggleFullScreenSwitch} />}
 
-        <FormControlLabel
-          label="Automatically finish break when time isup"
-          control={
-            <Switch color="primary" checked={state.autoFinishBreak} onChange={toggleAutoFinishBreak} />}
+          />
 
-        />
+          <FormControlLabel
+            label="Automatically finish break when time isup"
+            control={
+              <Switch color="primary" checked={state.autoFinishBreak} onChange={toggleAutoFinishBreak} />}
 
-        <IntervalSlider
-          name="shortBreak"
-          label="Short Break Interval"
-          step={60}
-          min={60}
-          value={state.schedule.shortBreak.interval}
-          max={13 * 60}
-          onChange={onChangeHandler}
-        />
+          />
 
-        <IntervalSlider
-          name="mediumBreak"
-          label="Medium Break Interval"
-          step={2 * state.schedule.shortBreak.interval}
-          min={2 * state.schedule.shortBreak.interval}
-          value={state.schedule.mediumBreak.interval}
-          max={2 * 13 * state.schedule.shortBreak.interval}
-          onChange={onChangeHandler}
-        />
+          <IntervalSlider
+            name="shortBreak"
+            label="Short Break Interval"
+            step={60}
+            min={60}
+            value={state.schedule.shortBreak.interval}
+            max={13 * 60}
+            onChange={onChangeHandler}
+          />
 
-        <IntervalSlider
-          name="longBreak"
-          label="Long Break Interval"
-          step={2 * state.schedule.mediumBreak.interval}
-          min={2 * state.schedule.mediumBreak.interval}
-          value={state.schedule.longBreak.interval}
-          max={2 * 13 * state.schedule.mediumBreak.interval}
-          onChange={onChangeHandler}
-        />
+          <IntervalSlider
+            name="mediumBreak"
+            label="Medium Break Interval"
+            step={2 * state.schedule.shortBreak.interval}
+            min={2 * state.schedule.shortBreak.interval}
+            value={state.schedule.mediumBreak.interval}
+            max={2 * 13 * state.schedule.shortBreak.interval}
+            onChange={onChangeHandler}
+          />
+
+          <IntervalSlider
+            name="longBreak"
+            label="Long Break Interval"
+            step={2 * state.schedule.mediumBreak.interval}
+            min={2 * state.schedule.mediumBreak.interval}
+            value={state.schedule.longBreak.interval}
+            max={2 * 13 * state.schedule.mediumBreak.interval}
+            onChange={onChangeHandler}
+          />
+
+          <input type="submit" value="Submit" />
+        </form>
+
       </Container>
+
 
     </>
   );

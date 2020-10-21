@@ -115,7 +115,7 @@ function createSettingsWindow() {
   );
 
   // Open the DevTools.
-  //mainWindow.webContents.openDevTools();
+  settingsWindow.webContents.openDevTools();
 
   // Is run when closing the window
   settingsWindow.on('close', (event) => {
@@ -239,6 +239,13 @@ app.on("window-all-closed", () => {
 ipcMain.on('finishBreakButtonClicked', (event, arg) => {
   closeBreaksWindow();
   breakScheduler.restartScheduler();
+})
+
+ipcMain.on('settingsSaved', (event, arg) => {
+  settings = arg
+
+  // TODO: Find a way so settings won't require a restart of the scheduler. E.g. Find current running timer, adjust accordingly and move on from there. 
+  breakScheduler.restartScheduler(arg.schedule);
 })
 
 

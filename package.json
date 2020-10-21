@@ -6,6 +6,7 @@
     "build": "tsc",
     "watch": "tsc -w",
     "lint": "tslint -c tslint.json -p tsconfig.json",
+    "electronOnly": "tsc && electron .",
     "start": "concurrently \"tsc && electron .\" \"cd settings_dialog && cross-env BROWSER=none npm start\"",
     "package": "tsc && electron-forge package",
     "make": "tsc && electron-forge make"
