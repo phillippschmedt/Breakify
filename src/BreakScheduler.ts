@@ -16,11 +16,12 @@ export interface Schedule {
 export interface BreakScheduler {
     startScheduler(): void,
     stopScheduler(): void,
-    restartScheduler(newSchedule? : Schedule): void,
+    restartScheduler(newSchedule?: Schedule): void,
     skipToNextBreak(): void,
     timeToNextBreak(): number,
     isRunning(): boolean
 }
+
 /**
  * Factory Method to create a BreakScheduler
  * @param  {Schedule} schedule A schedule containing at least one active break
@@ -29,12 +30,9 @@ export interface BreakScheduler {
  * @return {BreakScheduler}  Returns a breakscheduler
  */
 export function createBreakScheduler(schedule: Schedule, startBreakCallback: (duration: number) => void, stopBreakCallback: () => void, schedulerStartedCallback: () => void, schedulerStoppedCallback: () => void, autoStartNextInterval = true): BreakScheduler {
-
     // Makes sure schedule has at least one active break
     // Then calculates the shortestInterval
     let shortestInterval: number
-
-
     let intervalCounter: number
     let intervalTimer: NodeJS.Timeout
     let breakTimer: NodeJS.Timeout
@@ -44,6 +42,7 @@ export function createBreakScheduler(schedule: Schedule, startBreakCallback: (du
     initialize(schedule);
 
     function initialize(schedule: Schedule) {
+
         if (schedule.shortBreak?.active) {
             shortestInterval = schedule.shortBreak.interval
         } else if (schedule.mediumBreak?.active) {
@@ -53,6 +52,7 @@ export function createBreakScheduler(schedule: Schedule, startBreakCallback: (du
         } else {
             throw "Error: createBreakScheduler() - Schedule has no active"
         }
+
         intervalCounter = shortestInterval
         isRunning = false
     }
@@ -112,9 +112,7 @@ export function createBreakScheduler(schedule: Schedule, startBreakCallback: (du
         breakTimer = setTimeout(() => {
             breakDone()
         }, duration * 1000);
-
     }
-
 
     // Returns the duration of the next break
     function calculateNextBreak(): number {
